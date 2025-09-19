@@ -15,18 +15,28 @@ export const generateInvocation = async (planetaryData: PlanetaryData): Promise<
 
     const { name, angelicRuler, intelligence, spirit, attributes } = planetaryData;
 
-    const prompt = `
-        Generate a short, poetic invocation for a magical ritual, in the style of Renaissance grimoires like Francis Barrett's 'The Magus'.
-        The invocation should be directed towards the energies of the current planetary hour. Do not include any introductory text, just the invocation itself.
+    const systemInstruction = `
+        You are an esoteric scholar and ritualist, deeply versed in Renaissance-era ceremonial magic and the writing style of grimoires like Francis Barrett's 'The Magus'.
+        Your purpose is to craft authentic, potent invocations.
+        Your responses must be ONLY the invocation text itself, with no surrounding explanations, titles, or introductory phrases like "Here is the invocation:".
+        The invocation should be concise, approximately 4-6 lines long.
+    `;
 
-        Current Astrological Context:
+    const prompt = `
+        Craft a poetic invocation for a magical ritual.
+
+        Astrological Context:
         - Ruling Planet: ${name}
         - Presiding Archangel: ${angelicRuler}
         - Planetary Intelligence: ${intelligence}
         - Planetary Spirit: ${spirit}
         - Associated Themes: ${attributes.join(', ')}
 
-        The tone must be esoteric, reverent, and potent. Address the celestial beings by name and ask to be attuned to their virtues.
+        Instructions:
+        1. The style must emulate a 19th-century grimoire.
+        2. The tone must be esoteric, reverent, and potent.
+        3. Address the celestial beings by name (Archangel, Intelligence, and Spirit).
+        4. The invocation should ask to be attuned to the planet's virtues as represented by the associated themes.
     `;
 
     try {
@@ -34,12 +44,13 @@ export const generateInvocation = async (planetaryData: PlanetaryData): Promise<
             model: 'gemini-2.5-flash',
             contents: prompt,
             config: {
-                temperature: 0.8,
+                systemInstruction: systemInstruction,
+                temperature: 0.7,
                 topP: 0.95,
             }
         });
         
-        return response.text;
+        return response.text.trim();
     } catch (error) {
         console.error("Error generating invocation:", error);
         return "An error occurred while communicating with the celestial spheres. Please try again later.";
